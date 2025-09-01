@@ -19,10 +19,7 @@ use Doctrine\DBAL\Connection;
 
 class EufContactMigration extends AbstractMigration
 {
-    /**
-     * @var Connection
-     */
-    private $connection;
+    private Connection $connection;
 
     public function __construct(Connection $connection)
     {
@@ -31,50 +28,60 @@ class EufContactMigration extends AbstractMigration
 
     public function shouldRun(): bool
     {
-        $schemaManager = $this->connection->getSchemaManager();
-
+        $schemaManager = $this->connection->createSchemaManager();
         $columns = $schemaManager->listTableColumns('tl_content');
 
-        return
-        // column names needs to be written in lowercase!
-         !isset($columns['contactname'], $columns['contactposition']);
+        // Prüfen ob die neuen Spalten bereits existieren
+        $newColumnsExist = isset(
+            $columns['contactname'],
+            $columns['contactposition'],
+            $columns['contactemail'],
+            $columns['contactphone'],
+            $columns['contactdescription']
+        );
 
-        return
-            $this->connection->fetchOne(
-                "SELECT COUNT(*) FROM tl_content WHERE type = 'contact'"
-            ) > 0;
+        // Migration nur ausführen, wenn die neuen Spalten noch nicht existieren
+        return !$newColumnsExist;
     }
 
     public function run(): MigrationResult
     {
+        $schemaManager = $this->connection->createSchemaManager();
+        $columns = $schemaManager->listTableColumns('tl_content');
 
+        // Neue Spalten hinzufügen
         $this->connection->executeQuery("
-            ALTER TABLE
-                tl_content
-
-            ADD contactName varchar(255) NOT NULL default '',
-            ADD contactPosition varchar(255) NOT NULL default '',
-            ADD contactEmail varchar(255) NOT NULL default '',
-            ADD contactPhone varchar(255) NOT NULL default '',
-            ADD contactDescription mediumtext NULL
+            ALTER TABLE tl_content
+            ADD COLUMN contactName varchar(255) NOT NULL DEFAULT '',
+            ADD COLUMN contactPosition varchar(255) NOT NULL DEFAULT '',
+            ADD COLUMN contactEmail varchar(255) NOT NULL DEFAULT '',
+            ADD COLUMN contactPhone varchar(255) NOT NULL DEFAULT '',
+            ADD COLUMN contactDescription mediumtext NULL
         ");
 
-        $stmt = $this->connection->prepare('
-            UPDATE
-                tl_content
-            SET
-                contactName = contact_name,
-                contactPosition = contact_position,
-                contactEmail = contact_email,
-                contactDescription = contact_description
+        // Nur Daten migrieren, wenn die alten Spalten existieren
+        $oldColumnsExist = isset(
+            $columns['contact_name'],
+            $columns['contact_position'],
+            $columns['contact_email'],
+            $columns['contact_description']
+        );
 
-            WHERE
-                type = :type
-        ');
+        if ($oldColumnsExist) {
+            $stmt = $this->connection->prepare('
+                UPDATE tl_content
+                SET
+                    contactName = contact_name,
+                    contactPosition = contact_position,
+                    contactEmail = contact_email,
+                    contactDescription = contact_description
+                WHERE type = :type
+            ');
 
-        $stmt->bindValue('type', 'contact');
-        $stmt->execute();
+            $stmt->bindValue('type', 'contact');
+            $stmt->execute();
+        }
 
-        return $this->createResult(true, 'Migrate euf_hero to hero-element');
+        return $this->createResult(true, 'Contact element migration completed');
     }
 }
