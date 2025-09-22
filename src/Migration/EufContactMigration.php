@@ -29,6 +29,11 @@ class EufContactMigration extends AbstractMigration
     public function shouldRun(): bool
     {
         $schemaManager = $this->connection->createSchemaManager();
+        // Prüfen ob die Tabelle tl_content existiert
+        if (!$schemaManager->tablesExist(['tl_content'])) {
+            return false;
+        }
+
         $columns = $schemaManager->listTableColumns('tl_content');
 
         // Prüfen ob die neuen Spalten bereits existieren
