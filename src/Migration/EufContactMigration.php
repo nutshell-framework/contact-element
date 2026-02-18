@@ -55,7 +55,7 @@ class EufContactMigration extends AbstractMigration
         $columns = $schemaManager->listTableColumns('tl_content');
 
         // Neue Spalten hinzufügen
-        $this->connection->executeQuery("
+        $this->connection->executeStatement("
             ALTER TABLE tl_content
             ADD COLUMN contactName varchar(255) NOT NULL DEFAULT '',
             ADD COLUMN contactPosition varchar(255) NOT NULL DEFAULT '',
@@ -73,7 +73,7 @@ class EufContactMigration extends AbstractMigration
         );
 
         if ($oldColumnsExist) {
-            $stmt = $this->connection->prepare('
+            $this->connection->executeStatement('
                 UPDATE tl_content
                 SET
                     contactName = contact_name,
@@ -81,10 +81,7 @@ class EufContactMigration extends AbstractMigration
                     contactEmail = contact_email,
                     contactDescription = contact_description
                 WHERE type = :type
-            ');
-
-            $stmt->bindValue('type', 'contact');
-            $stmt->execute();
+            ', ['type' => 'contact']);
         }
 
         return $this->createResult(true, 'Contact element migration completed');
