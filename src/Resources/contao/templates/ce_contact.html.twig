@@ -1,0 +1,53 @@
+<div class="{{ class }} block"{{ cssID|raw }}{% if style %} style="{{ style }}"{% endif %}>
+
+  {% if headline %}
+    <{{ hl }}>{{ headline }}</{{ hl }}>
+  {% endif %}
+
+  {% if addContactImage %}
+    <figure class="contact__image{{ floatClass }}"{% if margin %} style="{{ margin }}"{% endif %}>
+
+      {% if href %}
+        <a href="{{ href }}"{% if linkTitle %} title="{{ linkTitle }}"{% endif %}{{ attributes|raw }}>
+      {% endif %}
+
+      {{ include('@Contao/picture_default.html.twig', picture, false) }}
+
+      {% if href %}
+        </a>
+      {% endif %}
+
+      {% if caption %}
+        <figcaption class="caption">{{ caption }}</figcaption>
+      {% endif %}
+
+    </figure>
+  {% endif %}
+
+  <div class="contact__details">
+    <div class="inside">
+      {% if contactName %}
+        <div class="contact__name">{{ contactName }}</div>
+      {% endif %}
+
+      {% if contactPosition %}
+        <div class="contact__position">{{ contactPosition }}</div>
+      {% endif %}
+
+      {% if contactDescription %}
+        <div class="contact__description">{{ contactDescription|raw }}</div>
+      {% endif %}
+
+      {% if contactPhone %}
+        <div class="contact__phone">{{ contactPhone }}</div>
+      {% endif %}
+
+      {% if contactEmail %}
+        <div class="contact__email">
+          <a href="{{ contactEmailLink }}" title="{{ contactName }}">{{ contactEmail }}</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
