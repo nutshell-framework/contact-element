@@ -1,12 +1,13 @@
+{% set hasImage = addContactImage and picture is defined %}
+
 <div class="{{ class }} block"{{ cssID|raw }}{% if style %} style="{{ style }}"{% endif %}>
 
   {% if headline %}
     <{{ hl }}>{{ headline }}</{{ hl }}>
   {% endif %}
 
-  {% if addContactImage %}
+  {% if hasImage %}
     <figure class="contact__image{{ floatClass }}"{% if margin %} style="{{ margin }}"{% endif %}>
-
       {% if href %}
         <a href="{{ href }}"{% if linkTitle %} title="{{ linkTitle }}"{% endif %}{{ attributes|raw }}>
       {% endif %}
@@ -20,7 +21,6 @@
       {% if caption %}
         <figcaption class="caption">{{ caption }}</figcaption>
       {% endif %}
-
     </figure>
   {% endif %}
 

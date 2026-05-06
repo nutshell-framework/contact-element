@@ -13,11 +13,9 @@ declare(strict_types=1);
 
 namespace Nutshell\ContactElement\Content;
 
-use Contao\Config;
 use Contao\ContentElement;
 use Contao\FilesModel;
 use Contao\StringUtil;
-use Contao\Validator;
 use Contao\System;
 
 class Contact extends ContentElement
@@ -34,39 +32,28 @@ class Contact extends ContentElement
      */
     protected function compile(): void
     {
-
-        // Add the static files URL to images
-        if ($staticUrl = System::getContainer()->get('contao.assets.files_context')->getStaticUrl()) {
-            $path = Config::get('uploadPath') . '/';
-        }
-
-        $this->Template->text = StringUtil::encodeEmail($this->text);
         $this->Template->addContactImage = false;
 
         // Add an image
         if ($this->addContactImage && $this->singleSRC) {
             $objModel = FilesModel::findByUuid($this->singleSRC);
 
-            if ($objModel !== null && is_file(System::getContainer()->getParameter('kernel.project_dir') . '/' . $objModel->path)) {
-                $this->singleSRC = $objModel->path;
-                $this->overwriteMeta = ($this->alt || $this->imageTitle || $this->caption);
-
+            if (null !== $objModel && is_file(System::getContainer()->getParameter('kernel.project_dir').'/'.$objModel->path)) {
                 $figure = System::getContainer()
-                ->get('contao.image.studio')
-                ->createFigureBuilder()
-                ->from($objModel->path)
-                ->setSize($this->size)
-                ->setMetadata($this->objModel->getOverwriteMetadata())
-                ->enableLightbox((bool) $this->fullsize)
-                ->buildIfResourceExists();
+                    ->get('contao.image.studio')
+                    ->createFigureBuilder()
+                    ->from($objModel->path)
+                    ->setSize($this->size)
+                    ->setOverwriteMetadata($this->objModel->getOverwriteMetadata())
+                    ->enableLightbox((bool) $this->fullsize)
+                    ->buildIfResourceExists()
+                ;
 
-                if (null !== $figure)
-                {
+                if (null !== $figure) {
                     $figure->applyLegacyTemplateData($this->Template, $this->imagemargin, $this->floating);
+                    $this->Template->addContactImage = true;
                 }
             }
-
-            $this->Template->addContactImage = true;
         }
 
         // Encode contact email
