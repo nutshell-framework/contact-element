@@ -35,7 +35,7 @@
       {% endif %}
 
       {% if contactDescription %}
-        <div class="contact__description">{{ contactDescription|default|sanitize_html('contao')|csp_inline_styles|insert_tag_raw }}</div>
+        <div class="contact__description">{{ contactDescription|raw }}</div>
       {% endif %}
 
       {% if contactPhone %}
