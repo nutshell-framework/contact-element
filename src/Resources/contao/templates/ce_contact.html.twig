@@ -7,18 +7,18 @@
   {% endif %}
 
   {% if hasImage %}
-    <figure class="contact__image{{ floatClass }}"{% if margin %} style="{{ margin }}"{% endif %}>
-      {% if href %}
-        <a href="{{ href }}"{% if linkTitle %} title="{{ linkTitle }}"{% endif %}{{ attributes|raw }}>
+    <figure class="contact__image{{ floatClass ?? '' }}">
+      {% if href ?? false %}
+        <a href="{{ href }}"{% if linkTitle ?? false %} title="{{ linkTitle }}"{% endif %}{{ (attributes ?? '')|raw }}>
       {% endif %}
 
       {{ include('@Contao/picture_default.html.twig', picture, false) }}
 
-      {% if href %}
+      {% if href ?? false %}
         </a>
       {% endif %}
 
-      {% if caption %}
+      {% if caption ?? false %}
         <figcaption class="caption">{{ caption }}</figcaption>
       {% endif %}
     </figure>
