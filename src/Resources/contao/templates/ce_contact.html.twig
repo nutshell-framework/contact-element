@@ -35,7 +35,7 @@
       {% endif %}
 
       {% if contactDescription %}
-        <div class="contact__description">{{ contactDescription|raw }}</div>
+        <div class="contact__description">{{ contactDescription|insert_tag_raw }}</div>
       {% endif %}
 
       {% if contactPhone %}
