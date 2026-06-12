@@ -3,7 +3,7 @@
 <div class="{{ class }} block"{{ cssID|raw }}{% if style %} style="{{ style }}"{% endif %}>
 
   {% if headline %}
-    <{{ hl }}>{{ headline }}</{{ hl }}>
+    <{{ hl }}>{{ headline|insert_tag_raw }}</{{ hl }}>
   {% endif %}
 
   {% if hasImage %}
